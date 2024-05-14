@@ -145,3 +145,154 @@ Distancia de levensthein: El número de caracteres que he de:
 - añadir
 - eliminar
 de una palabra para transformala en otra.
+
+---
+
+Carga del fichero
+    Lineas del fichero -> split(=)  -> me quedo con la primera parte ->  palabras
+
+Búsqueda de palabras similares                                                            Comparator.comparing(palabraPuntuada-> palabraPuntuada.distancia)
+    Stream<String>                              -> Stream<PalabraPuntuada>              ->  Stream<PalabraPuntuada>      -> Stream<PalabraPuntuada> -->      Stream<String>       -->   List<String>
+    para cada palabra -> map(new PalabraPuntuada(palabra, distanciaLev))        -> sorted(distancia)               --> limit(10)           --->       map(palabra)         ---> .collect()
+                                    ***********                                     ************
+                       ^                                                     ^
+                filter(Math.abs(palabra.length-comparada.length<=2))
+             manzana                                                           filter(distancia<=2)
+             albaricoque (4 caracteres más)                                     Para que 2 palabras se parezcan...
+                               ||                                               como mucho te dejo que cambies hasta 2
+                            distanciaMinimaLeve=4                               manzana
+             sal(4 de menos???)                                                 montana
+                                                                                pontana
+
+
+Clase : Palabra Puntuada
+ - Palabra
+ - Distancia
+
+---
+# APACHE SPARK 
+
+    Programa (SCRIPT SPARK)
+   ----------------------------
+    Me voy a conectar con un cluster                            Nodo Maestro Spark          Nodos Trabajadores
+    Le configuro un trabajo                                                                      Nodo 1
+    Obtengo resultado                                                                           Nodo 2
+    Cierro conexión
+
+
+Ya os comenté que Apache Spark es una reimplementación del motor de procesamiento
+MAP/REDUCE de Apache Hadoop trabajando sobre memoria RAM.
+
+Básicamente es una versión de la librería java.util.stream, que reparte el trabajo entre máquinas remotas.
+Spark nos ofrece su propia implementación de la clase "Stream", llamada RDD.
+
+Un RDD de spark es el equivalente a un Stream de Java.
+Dentro de un RDD tendremos por tanto: funciones MAP y REDUCE...más o menos las mismas que en la clase Stream...
+Con ligeras diferencias en algunas.
+
+Spark se puede usar desde:
+- SCALA
+- PYTHON
+- JAVA   <<<<   Es la peor opción posible para trabajar contra Spark
+- R
+
+---
+
+JAVA 1.5            
+- Genéricos
+- Collections
+- Iterables
+- Anotaciones
+
+JAVA 1.8
+- Programación funcional
+- Streams
+- Optional
+
+JAVA 1.9
+- Proyecto Jigsaw
+  Antes de Java 1.9, que tipos de cosas podíamos crear en JAVA: classes y interfaces.. que se agrupaban en paquetes
+  Y que modificadores de privacidad teníamos disponibles? private, public, protected, default(friendly)
+  Y eso es suficiente? NI DE COÑA !
+  - CAGADAS DE JAVA ... parte III
+  En JAVA 1.9 se crea un nuevo tipo de objeto en java: modules
+    ```java
+    module "libreria-diccionario" {
+      
+      exports  "com.diccionarios.api";
+      uses
+      provides
+      requires
+    }
+    ```
+    
+    En JAVA 9, se modulariza la JVM.
+    La gente puede crear sus propios módulos... y exportar de ellos solamente los paquetes que quieran exportar.
+    
+    ---
+    package com.diccionarios.api;
+    public interface Diccionario{}
+    ---
+    package com.diccionarios.api;
+    public interface SuministradorDeDiccionarios{
+    public Optional<Diccionario> getDiccionario(String idioma);
+    }
+    
+    ---
+    package com.diccionarios.api;
+    import com.diccionarios.api.SuministradorDeDiccionarios;
+    import com.diccionarios.impl.SuministradorDeDiccionariosImpl;
+    public interface SuministradorDeDiccionariosFactory{ // PUES CLARO... YAA ERA HORA... hasta puto java 1.8 tuvimos que esperar. CAGADAS DE JAVA ... parte 4
+    public static SuministradorDeDiccionarios getInstance(){
+    // Una cache de suministradores (Antes de)
+    return new SuministradorDeDiccionariosImpl();
+    }
+    }
+    ---
+    
+    package com.diccionarios.impl;
+    public class DiccionarioImpl implements Diccionario{}
+    public class SuministradorDeDiccionariosImpl implements SuministradorDeDiccionarios{}
+    ---
+    diccionarios-libreria.jar
+    
+    ...
+    
+    SuministradorDeDiccionarios miSuministrador = SuministradorDeDiccionariosFactory.getInstance();
+    SuministradorDeDiccionarios miSuministrador = new SuministardorDeDiccionariosImpl();
+  Todo el código del API de JAVA se metió en MODULOS
+  Y al arrancar la JVM puedo elegir qué módulos quiero activar
+  Y además, varios módulos considerados INSEGUROS: REFLECTIONS se desactivan por defecto en la JVM... Inicialos a tu discreción!!!
+Hadoop implementa su propio sistema de archivos: HDFS
+Y usa funciones posix para la gestión de archivos:
+  - mkdir
+  - cd
+  - rm
+  - rm -r
+  - ls 
+
+---
+Tuple2??? ._1, ._2
+
+JavaPairRDD ~= JavaRDD<Tuple2>
+Algo así como un hashmap... pero donde las claves... no son claves únicas
+
+JavaRDD.mapToPair( (T)-> Tuple2  ) -> JavaPairRDD
+JavaPairRDD.reduceByKey( (val1,val2) -> val1+val2 ) --> JavaPairRDD .mapToPair( tupla -> new Tuple2( tupla._2, tupla._1))
+                                                                .sortByKey().mapToPair( tupla -> new Tuple2( tupla._2, tupla._1))
+                                                                .take(10)
+NO HAY ALTERNATIVA A ESTO !
+
+GoodVibes       -> [GoodVives, 1]           -> [GoodVibes, 3]
+GoodVibes       -> [GoodVives, 1]
+SummerLove
+GoodVibes       -> [GoodVives, 1]
+SummerLove
+MierdaDeCurso
+
+
+GoodVibes       3
+SummerLove      2
+------------------
+MierdaDeCurso   1
+
