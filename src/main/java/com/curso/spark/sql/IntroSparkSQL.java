@@ -5,7 +5,11 @@ import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.sql.Dataset;
 import org.apache.spark.sql.Row;
 import org.apache.spark.sql.SparkSession;
+import org.apache.spark.sql.types.DataTypes;
+
 import static org.apache.spark.sql.functions.col;
+import static org.apache.spark.sql.functions.udf;
+
 public class IntroSparkSQL {
 
     public static void main(String[] arg){
@@ -79,6 +83,11 @@ public class IntroSparkSQL {
         Dataset<Row> personasConDNIValido = conexion.createDataFrame(personasConDNIValidoRDD, Persona.class); // Persona.class se usa para generar el schema del ROW
         personasConDNIValido.show();
 
+        conexion.udf().register(
+                "esValido",
+                udf( (String dni) -> DNIUtils.isDNIValido(dni) , DataTypes.BooleanType )
+        );
+        conexion.sql("SELECT nombre, dni FROM personas WHERE esValido(dni)").show();
 
         conexion.close();
     }
