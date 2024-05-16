@@ -13,7 +13,7 @@ public class EstimarPi {
         // Paso 1: Abrir una conexión con Spark
         final SparkConf configuracionDeLaConexion = new SparkConf();
         configuracionDeLaConexion.setAppName("EstimadorDePiApp"); // Identifica mi app en el cluster de Spark
-        configuracionDeLaConexion.setMaster("local[3]"); // Aquí doy la RUTA DEL CLUSTER DE SPARK
+        //configuracionDeLaConexion.setMaster("local[3]"); // Aquí doy la RUTA DEL CLUSTER DE SPARK
                                                      // TRUCO: Al poner local, se levanta en tiempo de ejecución un cluster de Spark en mi JVM... y me conecta con él.
                                                      // Eso sirve para pruebas en desarrollo... LUEGO SE QUITA !
                                                      // El numerito entre corchetes es el número de virtual cores de mi máquina que permito usar al cluster de spark.
