@@ -48,6 +48,7 @@ public class IntroSparkSQL {
              .orderBy(col("sum(edad)").desc())
              .show();
 
+
         // Vamos a más... QUE EMPIECE LA MAGIA!
         datos.createOrReplaceTempView("personas");
         // Esta función registra los datos bajo el nombre "personas". Para que? Para que ahora pueda escribir SQL PELAO
