@@ -195,6 +195,7 @@ Spark se puede usar desde:
 - PYTHON
 - JAVA   <<<<   Es la peor opción posible para trabajar contra Spark
 - R
+- SQL
 
 ---
 
